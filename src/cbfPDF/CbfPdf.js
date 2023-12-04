@@ -1,4 +1,3 @@
-import "./App.css";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { useState } from "react";
@@ -20,7 +19,7 @@ import html2canvas from "html2canvas";
 import BarChart from "../BarChart";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-function App() {
+function CbfPdf() {
   const createHeader = (includePageBreak = false) => {
     const header = {
       columns: [
@@ -68,6 +67,123 @@ function App() {
     customMarginsValue2
   );
 
+  // DATA SUMMARY FUNCTION
+  const emissionParams = {
+    buildings: {
+      emissions: 20.23,
+      energyType: "234 litres of petrol",
+      title: "Buildings",
+    },
+    flights: { emissions: 22.8, title: "Flights" },
+    carsAndRail: { emissions: 332.7, title: "Cars and Rail" },
+    abc: { emissions: 332.7, title: "Cars and Rail" },
+    xyz: { emissions: 332.7, title: "Cars and Rail" },
+    numberOfEmployees: 5,
+  };
+
+  var carbonoIntensityValue;
+
+  function generateEmissionDetails(emissionParams) {
+    const dynamicData = [];
+    let totalEmissions = 0;
+
+    Object.keys(emissionParams).forEach((type) => {
+      if (emissionParams[type].emissions !== undefined) {
+        const energyType =
+          emissionParams[type].energyType || "(no data supplied)";
+
+        const emissionsValue = emissionParams[type].emissions;
+        totalEmissions += emissionsValue;
+
+        carbonoIntensityValue =
+          totalEmissions / emissionParams.numberOfEmployees;
+        const title = emissionParams[type].title;
+
+        const data = {
+          margin: [0, 0, 0, 10],
+          stack: [
+            {
+              text: title,
+              bold: true,
+              fontSize: 14,
+              margin: [0, 0, 0, 10],
+            },
+            {
+              columns: [
+                {
+                  stack: [
+                    {
+                      text: "Tonnes of CO2e",
+                      bold: true,
+                      margin: [0, 0, 0, 10],
+                    },
+                    {
+                      text: emissionsValue.toString(),
+                      style: "content",
+                      alignment: "center",
+                      margin: [5, 0, 0, 0],
+                    },
+                    {
+                      text: emissionsValue.toString(),
+                      bold: true,
+                      alignment: "center",
+                      margin: [5, 0, 0, 0],
+                    },
+                  ],
+                  width: "16%",
+                },
+                {
+                  stack: [
+                    {
+                      text: `${title} Details`,
+                      bold: true,
+                      margin: [0, 0, 0, 10],
+                    },
+                    { text: energyType, style: "content" },
+                    { text: `Total ${title} emissions footprint`, bold: true },
+                  ],
+                  width: "60%",
+                },
+              ],
+            },
+          ],
+        };
+
+        dynamicData.push(data);
+      }
+    });
+
+    return dynamicData;
+  }
+
+  function generatePieDescriptionText(emissionParams) {
+    const dynamicData = generateEmissionDetails(emissionParams);
+
+    const totalEmissions = dynamicData.reduce(
+      (total, data) =>
+        total + parseFloat(data.stack[1].columns[0].stack[1].text),
+      0
+    );
+
+    const carbonoIntensityValue =
+      totalEmissions / emissionParams.numberOfEmployees;
+
+    const pieDescriptionText = {
+      style: "pieDescriptionText",
+      text: `Your total carbon footprint is ${totalEmissions.toFixed(
+        2
+      )} tonnes CO2e \n Carbon intensity (tonnes CO / employees) = ${carbonoIntensityValue.toFixed(
+        2
+      )} \n Read on for your full report & recommendations`,
+    };
+
+    return pieDescriptionText;
+  }
+
+  const dynamicDataArray = generateEmissionDetails(emissionParams);
+
+  const pieDescriptionText = generatePieDescriptionText(emissionParams);
+
   const createFooter = (
     currentPage,
     pageCount,
@@ -94,7 +210,7 @@ function App() {
   const customMargin2 = [10, 680, 30, 40];
   const footerCustomMargin = createFooter(2, 7, customMargin2);
 
-  const customMargin3 = [10, 930, 30, 40];
+  const customMargin3 = [10, 880, 30, 40];
   const footerCustomMargin3 = createFooter(3, 7, customMargin3);
 
   const customMargin4 = [10, 470, 30, 40];
@@ -190,7 +306,10 @@ function App() {
                   ],
                   [
                     { text: "Number of employees", alignment: "left" },
-                    { text: "15", alignment: "left" },
+                    {
+                      text: `${emissionParams.numberOfEmployees}`,
+                      alignment: "left",
+                    },
                   ],
                   // ["Date period", "not specified"],
                 ],
@@ -210,14 +329,7 @@ function App() {
         },
 
         // PIE CHART COMES HERE
-        {
-          columns: [
-            {
-              style: "pieDescriptionText",
-              text: "Your total carbon footprint is 10.6 tonnes C02e \n Carbon intensity (tonnes CO /employees) = 0.7 \n Read on for your full report & recommendations",
-            },
-          ],
-        },
+        pieDescriptionText,
         {
           columns: [
             {
@@ -253,8 +365,12 @@ function App() {
                     "Become Carbon Neutral now from just £95.68",
                     "Offset your businesses’ emissions now at:",
                     {
-                      text: "www.carbonfootprint.com/offset=10.6",
-                      link: "http://www.carbonfootprint.com/offset=10.6",
+                      text: `www.carbonfootprint.com/offset=${carbonoIntensityValue.toFixed(
+                        2
+                      )}`,
+                      link: `http://www.carbonfootprint.com/offset${carbonoIntensityValue.toFixed(
+                        2
+                      )}`,
                       color: "blue",
                     },
                     {
@@ -399,197 +515,11 @@ function App() {
             },
           ],
         },
-        {
-          columns: [
-            {
-              text: "Buildings",
-              bold: true,
-              fontSize: 14,
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
-          columns: [
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: "Tonnes of CO2e", bold: true },
-                    { text: "0.0", style: "content" },
-                    { text: "0.0", bold: true },
-                  ],
-                  width: "20%",
-                },
-                {
-                  stack: [
-                    { text: "Energy Type", bold: true },
-                    { text: "(no data supplied)", style: "content" },
-                    {
-                      text: "Total building emissions footprint",
-                      bold: true,
-                    },
-                  ],
-                  width: "60%",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          columns: [
-            {
-              text: "flights",
-              bold: true,
-              fontSize: 14,
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
 
-          columns: [
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: "Tonnes of CO2e", bold: true },
-                    { text: "0.0", style: "content" },
-                    { text: "0.0", bold: true },
-                  ],
-                  width: "20%",
-                },
-                {
-                  stack: [
-                    { text: "Energy Type", bold: true },
-                    { text: "(no data supplied)", style: "content" },
-                    {
-                      text: "Total building emissions footprint",
-                      bold: true,
-                    },
-                  ],
-                  width: "60%",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          columns: [
-            {
-              text: "Cars and Vans",
-              bold: true,
-              fontSize: 14,
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
+        //   /// SUMMARY of emmisionss/////
 
-          columns: [
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: "Tonnes of CO2e", bold: true },
-                    { text: "0.0", style: "content" },
-                    { text: "0.0", bold: true },
-                  ],
-                  width: "20%",
-                },
-                {
-                  stack: [
-                    { text: "Energy Type", bold: true },
-                    { text: "(no data supplied)", style: "content" },
-                    {
-                      text: "Total building emissions footprint",
-                      bold: true,
-                    },
-                  ],
-                  width: "60%",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          columns: [
-            {
-              text: "Vehicle Fuel",
-              bold: true,
-              fontSize: 14,
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
+        dynamicDataArray,
 
-          columns: [
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: "Tonnes of CO2e", bold: true },
-                    { text: "0.0", style: "content" },
-                    { text: "0.0", bold: true },
-                  ],
-                  width: "20%",
-                },
-                {
-                  stack: [
-                    { text: "Energy Type", bold: true },
-                    { text: "(no data supplied)", style: "content" },
-                    {
-                      text: "Total building emissions footprint",
-                      bold: true,
-                    },
-                  ],
-                  width: "60%",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
-
-          columns: [
-            {
-              text: "Bus and Rail",
-              bold: true,
-              fontSize: 14,
-            },
-          ],
-        },
-        {
-          margin: [0, 5, 0, 10],
-
-          columns: [
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: "Tonnes of CO2e", bold: true },
-                    { text: "0.0", style: "content" },
-                    { text: "0.0", bold: true },
-                  ],
-                  width: "20%",
-                },
-                {
-                  stack: [
-                    { text: "Energy Type", bold: true },
-                    { text: "(no data supplied)", style: "content" },
-                    {
-                      text: "Total building emissions footprint",
-                      bold: true,
-                    },
-                  ],
-                  width: "60%",
-                },
-              ],
-            },
-          ],
-        },
         footerCustomMargin3,
         createHeader(true),
         {
@@ -956,23 +886,30 @@ function App() {
     });
   };
   const chartData = {
-    labels: ["January", "February", "March", "April", "May"],
+    labels: Object.keys(emissionParams).map(
+      (key) => emissionParams[key].title || key
+    ),
     datasets: [
       {
         label: "Monthly Sales",
-        data: [65, 2],
-        backgroundColor: ["#f56942", "purple"],
+        data: Object.keys(emissionParams).map(
+          (key) => emissionParams[key].emissions
+        ),
+        backgroundColor: ["#f56942", "purple", "green", "yellow"],
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,
       },
     ],
   };
+
+  <ChartComponent data={chartData} />;
+
   const barChartData = {
-    labels: ["Your footprint", "Office based", "High energy rganziation"],
+    labels: ["Your footprint", "Office based", "High energy organziation"],
     datasets: [
       {
         label: "Monthly Sales",
-        data: [5, 29, 80],
+        data: [carbonoIntensityValue, 3.5, 20],
         backgroundColor: ["#48c268"],
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,
@@ -986,16 +923,13 @@ function App() {
         style={{ padding: "10px 10px", cursor: "pointer" }}
         onClick={createPdf}
       >
-        Generate PDF
+        Download PDF
       </button>
       {url && <div>{url}</div>}
-      <ChartComponent
-        style={{ height: "200px", width: "200px" }}
-        data={chartData}
-      />
+      <ChartComponent data={chartData} />
       <BarChart data={barChartData} />
     </div>
   );
 }
 
-export default App;
+export default CbfPdf;

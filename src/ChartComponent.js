@@ -15,7 +15,26 @@ const ChartComponent = ({ data }) => {
     const newChart = new Chart(canvas, {
       type: "pie",
       data: data,
-      options: {},
+      options: {
+        plugins: {
+          legend: {
+            position: "right",
+            labels: {
+              color: Chart.defaults.color,
+              boxWidth: 100,
+              boxHeight: 20,
+              borderRadius: 5,
+
+              font: {
+                size: 90,
+              },
+            },
+            title: {
+              display: true,
+            },
+          },
+        },
+      },
     });
 
     return () => {

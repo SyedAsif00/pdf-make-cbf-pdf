@@ -76,9 +76,11 @@ function CbfPdf() {
     },
     flights: { emissions: 22.8, title: "Flights" },
     carsAndRail: { emissions: 332.7, title: "Cars and Rail" },
-    abc: { emissions: 332.7, title: "Cars and Rail" },
-    xyz: { emissions: 332.7, title: "Cars and Rail" },
     numberOfEmployees: 5,
+    barChartData: {
+      officeBased: 3.5,
+      highEnergyOrganizations: 20,
+    },
   };
 
   var carbonoIntensityValue;
@@ -210,7 +212,7 @@ function CbfPdf() {
   const customMargin2 = [10, 680, 30, 40];
   const footerCustomMargin = createFooter(2, 7, customMargin2);
 
-  const customMargin3 = [10, 880, 30, 40];
+  const customMargin3 = [10, 1050, 30, 40];
   const footerCustomMargin3 = createFooter(3, 7, customMargin3);
 
   const customMargin4 = [10, 470, 30, 40];
@@ -321,9 +323,9 @@ function CbfPdf() {
           columns: [
             {
               image: dataUrl,
-              width: 180,
-              height: 180,
-              margin: [220, 10, 0, 10],
+              width: 280,
+              height: 280,
+              margin: [260, 0, 0, 0],
             },
           ],
         },
@@ -852,14 +854,14 @@ function CbfPdf() {
           margin: [0, 5, 0, 5],
         },
         tableExample: {
-          margin: [200, 5, 0, 30],
+          margin: [200, 5, 0, 0],
           alignment: "center",
         },
         pieChart: {
           margin: [150, 0],
         },
         pieDescriptionText: {
-          margin: [170, 8, 0, 40],
+          margin: [170, 0, 0, 40],
           fontSize: 15,
         },
         cbfListPage1: {
@@ -886,15 +888,15 @@ function CbfPdf() {
     });
   };
   const chartData = {
-    labels: Object.keys(emissionParams).map(
-      (key) => emissionParams[key].title || key
-    ),
+    labels: Object.keys(emissionParams)
+      .filter((key) => emissionParams[key].hasOwnProperty("emissions"))
+      .map((key) => emissionParams[key].title || key),
     datasets: [
       {
         label: "Monthly Sales",
-        data: Object.keys(emissionParams).map(
-          (key) => emissionParams[key].emissions
-        ),
+        data: Object.keys(emissionParams)
+          .filter((key) => emissionParams[key].hasOwnProperty("emissions"))
+          .map((key) => emissionParams[key].emissions),
         backgroundColor: ["#f56942", "purple", "green", "yellow"],
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,
@@ -908,8 +910,11 @@ function CbfPdf() {
     labels: ["Your footprint", "Office based", "High energy organziation"],
     datasets: [
       {
-        label: "Monthly Sales",
-        data: [carbonoIntensityValue, 3.5, 20],
+        data: [
+          carbonoIntensityValue,
+          emissionParams.barChartData.officeBased || 3.5,
+          emissionParams.barChartData.highEnergyOrganizations || 20,
+        ],
         backgroundColor: ["#48c268"],
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,

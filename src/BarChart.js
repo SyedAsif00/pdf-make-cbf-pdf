@@ -21,10 +21,28 @@ const ChartComponent = ({ data }) => {
       options: {
         plugins: {
           legend: {
+            display: false,
             labels: {
               font: {
-                size: "15px",
+                size: 100,
               },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: {
+              offset: false,
+            },
+            ticks: {
+              font: {
+                size: 30,
+              },
+            },
+          },
+          y: {
+            grid: {
+              offset: false,
             },
           },
         },

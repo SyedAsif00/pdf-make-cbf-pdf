@@ -24,7 +24,7 @@ const ChartComponent = ({ data }) => {
             display: false,
             labels: {
               font: {
-                size: 100,
+                size: 60,
               },
             },
           },
@@ -32,11 +32,11 @@ const ChartComponent = ({ data }) => {
         scales: {
           x: {
             grid: {
-              offset: false,
+              offset: true,
             },
             ticks: {
               font: {
-                size: 30,
+                size: 50,
               },
             },
           },
@@ -54,13 +54,7 @@ const ChartComponent = ({ data }) => {
     };
   }, [data]);
 
-  return (
-    <canvas
-      id="Barchart"
-      ref={canvasRef}
-      style={{ width: "1000px", height: "400px" }}
-    ></canvas>
-  );
+  return <canvas id="Barchart" ref={canvasRef}></canvas>;
 };
 
 export default ChartComponent;

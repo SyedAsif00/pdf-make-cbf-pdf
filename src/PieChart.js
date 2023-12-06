@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Chart } from "chart.js/auto";
 
-const ChartComponent = ({ data }) => {
+const PieChart = ({ data }) => {
   useEffect(() => {
     const canvas = document.getElementById("chart");
     const context = canvas.getContext("2d");
@@ -26,7 +26,7 @@ const ChartComponent = ({ data }) => {
               borderRadius: 5,
 
               font: {
-                size: 90,
+                size: 70,
               },
             },
             title: {
@@ -45,4 +45,4 @@ const ChartComponent = ({ data }) => {
   return <canvas id="chart" width="100px" height="100px"></canvas>;
 };
 
-export default ChartComponent;
+export default PieChart;

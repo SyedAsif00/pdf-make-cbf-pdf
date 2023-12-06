@@ -14,58 +14,13 @@ import {
   lastPageImages,
   combinedRowImages,
 } from "../base64images/images";
-import ChartComponent from "../ChartComponent";
+import PieChart from "../PieChart";
 import html2canvas from "html2canvas";
 import BarChart from "../BarChart";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function CbfPdf() {
-  const createHeader = (includePageBreak = false) => {
-    const header = {
-      columns: [
-        {
-          text: "Measured - You have completed the first step of your Carbon Footprint Journey",
-          style: "header",
-          margin: [0, 55, 0, includePageBreak ? 10 : 0],
-        },
-        {
-          image: logoImage,
-          width: 70,
-          height: 80,
-          alignment: "right",
-          margin: [0, 20, 0, 0],
-        },
-      ],
-    };
-
-    if (includePageBreak) {
-      header.pageBreak = "before";
-    }
-
-    return header;
-  };
-
-  const createRowImages = (combinedRowImages, customMargins = [0, 0, 0, 0]) => {
-    return {
-      columns: [
-        {
-          image: combinedRowImages,
-          width: 700,
-          margin: customMargins,
-        },
-      ],
-    };
-  };
-  const customMarginsValue = [0, 40, 0, 0];
-  const rowImagesCustomMargins = createRowImages(
-    combinedRowImages,
-    customMarginsValue
-  );
-  const customMarginsValue2 = [0, 30, 0, 0];
-  const rowImagesCustomMargins2 = createRowImages(
-    combinedRowImages,
-    customMarginsValue2
-  );
+  const [url, setUrl] = useState(null);
 
   // DATA SUMMARY FUNCTION
   const emissionParams = {
@@ -82,9 +37,6 @@ function CbfPdf() {
       highEnergyOrganizations: 20,
     },
   };
-
-  var carbonoIntensityValue;
-
   function generateEmissionDetails(emissionParams) {
     const dynamicData = [];
     let totalEmissions = 0;
@@ -157,7 +109,6 @@ function CbfPdf() {
 
     return dynamicData;
   }
-
   function generatePieDescriptionText(emissionParams) {
     const dynamicData = generateEmissionDetails(emissionParams);
 
@@ -181,15 +132,76 @@ function CbfPdf() {
 
     return pieDescriptionText;
   }
-
   const dynamicDataArray = generateEmissionDetails(emissionParams);
 
   const pieDescriptionText = generatePieDescriptionText(emissionParams);
 
+  const createHeader = (includePageBreak = false) => {
+    const header = {
+      columns: [
+        {
+          text: "Measured - You have completed the first step of your Carbon Footprint Journey",
+          style: "header",
+          margin: [0, 55, 0, includePageBreak ? 10 : 0],
+        },
+        {
+          image: logoImage,
+          width: 70,
+          height: 80,
+          alignment: "right",
+          margin: [0, 20, 0, 0],
+        },
+      ],
+    };
+
+    if (includePageBreak) {
+      header.pageBreak = "before";
+    }
+
+    return header;
+  };
+
+  const createRowImages = (combinedRowImages, customMargins = [0, 0, 0, 0]) => {
+    return {
+      columns: [
+        {
+          image: combinedRowImages,
+          width: 700,
+          margin: customMargins,
+        },
+      ],
+    };
+  };
+  const customMarginsValue = [0, 40, 0, 0];
+  const rowImagesCustomMargins = createRowImages(
+    combinedRowImages,
+    customMarginsValue
+  );
+  const customMarginsValue2 = [0, 30, 0, 0];
+  const rowImagesCustomMargins2 = createRowImages(
+    combinedRowImages,
+    customMarginsValue2
+  );
+
+  const cbfJourneySteps = (image, text) => {
+    return {
+      columns: [
+        { image, width: 60, height: 80 },
+        {
+          text,
+          margin: [14, 15, 0, 0],
+          color: "#188c79",
+          fontSize: 19,
+          bold: true,
+        },
+      ],
+    };
+  };
+
   const createFooter = (
     currentPage,
     pageCount,
-    customMargin = [0, 30, 10, 20]
+    customMargin = [0, 80, 10, 20]
   ) => {
     return {
       margin: customMargin,
@@ -209,40 +221,25 @@ function CbfPdf() {
       ],
     };
   };
-  const customMargin2 = [10, 680, 30, 40];
+  const customMargin2 = [10, 780, 30, 40];
   const footerCustomMargin = createFooter(2, 7, customMargin2);
 
-  const customMargin3 = [10, 1050, 30, 40];
+  const customMargin3 = [10, 1150, 30, 40];
   const footerCustomMargin3 = createFooter(3, 7, customMargin3);
 
-  const customMargin4 = [10, 470, 30, 40];
+  const customMargin4 = [10, 600, 30, 40];
   const footerCustomMargin4 = createFooter(4, 7, customMargin4);
 
-  const customMargin5 = [10, 660, 30, 40];
+  const customMargin5 = [10, 760, 30, 40];
   const footerCustomMargin5 = createFooter(5, 7, customMargin5);
 
-  const customMargin6 = [10, 480, 30, 40];
+  const customMargin6 = [10, 720, 30, 40];
   const footerCustomMargin6 = createFooter(6, 7, customMargin6);
 
-  const customMargin7 = [10, 1020, 30, 40];
+  const customMargin7 = [10, 1120, 30, 40];
   const footerCustomMargin7 = createFooter(7, 7, customMargin7);
 
-  const cbfJourneySteps = (image, text) => {
-    return {
-      columns: [
-        { image, width: 60, height: 80 },
-        {
-          text,
-          margin: [14, 15, 0, 0],
-          color: "#188c79",
-          fontSize: 19,
-          bold: true,
-        },
-      ],
-    };
-  };
-
-  const [url, setUrl] = useState(null);
+  var carbonoIntensityValue;
 
   const createPdf = async () => {
     const chartRef = document.getElementById("chart");
@@ -259,7 +256,7 @@ function CbfPdf() {
     const docDefinition = {
       pageSize: {
         width: 840,
-        height: 1560,
+        height: 1650,
       },
       pageMargins: [80, 30, 80, 0],
 
@@ -357,15 +354,31 @@ function CbfPdf() {
         },
         {
           margin: [0, 20, 0, 0],
+          fontSize: 16,
           columns: [
             {
               columns: [
                 {
-                  width: "70%",
+                  width: "68%",
                   stack: [
-                    "Carbon Neutrality - For CFP",
-                    "Become Carbon Neutral now from just £95.68",
-                    "Offset your businesses’ emissions now at:",
+                    `Carbon Neutrality - For CFP`,
+                    {
+                      margin: [0, 5, 0, 5],
+                      text: [
+                        "Become Carbon Neutral now from just ",
+
+                        {
+                          text: "£95.68",
+                          bold: true,
+                        },
+                      ],
+                    },
+
+                    {
+                      text: "Offset your businesses’ emissions now at, ",
+                      bold: true,
+                    },
+
                     {
                       text: `www.carbonfootprint.com/offset=${carbonoIntensityValue.toFixed(
                         2
@@ -376,15 +389,18 @@ function CbfPdf() {
                       color: "blue",
                     },
                     {
-                      text: "If your emissions are above 100 tonnes CO please ",
-                    },
-                    {
-                      text: "Contact us",
-                      link: "mailto:your-email@example.com",
-                      color: "blue",
-                    },
-                    {
-                      text: ` for a personalised offsetting proposal.`,
+                      margin: [0, 5, 0, 0],
+                      fontSize: 11,
+                      text: [
+                        "If your emissions are above 100 tonnes CO, ",
+                        {
+                          text: "Contact us",
+                          link: "mailto:your-email@example.com",
+                          fontSize: 12,
+                          color: "blue",
+                        },
+                        " for a personalized offsetting proposal.",
+                      ],
                     },
                   ],
                   margin: [10, 10, 10, 10],
@@ -402,19 +418,25 @@ function CbfPdf() {
           ],
         },
         {
+          fontSize: 16,
           stack: [
             {
               text: `Carbon Offsetting funds the solution to the climate emergency by:
             `,
             },
             {
+              margin: [30, 0, 0, 10],
               ul: [
-                ` Decarbonising national grids (for renewable energy projects)
-                  `,
-                ` Reducing emissions (via avoided deforestation projects - e.g. protecting the Amazon)
-                  `,
-                ` Enabling more efficient/greener energy use (e.g. cookstoves projects)
-                `,
+                {
+                  text: " Decarbonising national grids (for renewable energy projects)",
+                },
+                {
+                  margin: [0, 5, 0, 5],
+                  text: " Reducing emissions (via avoided deforestation projects - e.g. protecting the Amazon)",
+                },
+                {
+                  text: " Enabling more efficient/greener energy use (e.g. cookstoves projects)",
+                },
               ],
             },
             {
@@ -425,7 +447,7 @@ function CbfPdf() {
             {
               text: "www.carbonfootprint.com/carbonoffsetprojects.html",
               link: "http://www.carbonfootprint.com/carbonoffsetprojects.html",
-              margin: [100, 5, 0, 5],
+              margin: [140, 5, 0, 5],
               color: "blue",
             },
           ],
@@ -456,7 +478,7 @@ function CbfPdf() {
         },
         rowImagesCustomMargins2,
         {
-          margin: [0, 50],
+          margin: [20, 50],
           stack: [
             {
               text: `The purpose of this report is to`,
@@ -465,6 +487,7 @@ function CbfPdf() {
               margin: [0, -10, 0, 10],
             },
             {
+              margin: [30, 0, 0, 0],
               fontSize: 16,
               ul: [
                 { text: "Summarise your results", margin: [0, 0, 0, 5] },
@@ -585,23 +608,28 @@ function CbfPdf() {
               fontSize: 15,
             },
             {
+              margin: [30, 0, 0, 0],
               fontSize: 15,
 
-              margin: [0, 5, 0, 5],
               ul: [
                 {
                   text: 'Setting up a Carbon Management Plan - the old adage applies here - "fail to plan - plan to fail".',
                 },
                 {
+                  margin: [0, 5, 0, 5],
                   text: 'Achieving easy carbon reduction first - even if these actions may yield only small results, these are psychologically important and will help your organization to get a "taste" of success and develop a culture that enables you to tackle the bigger reduction opportunities.',
                 },
                 {
-                  text: "Get quantitative - use our Energy Efficiency Test to work out your capacity to save. Find it at",
-                },
-                {
-                  text: "www.carbonfootprint.com/energy_efficiency_test.html",
-                  link: "http://www.carbonfootprint.com/energy_efficiency_test.html",
-                  color: "blue",
+                  margin: [0, 5, 0, 5],
+
+                  text: [
+                    "Get quantitative - use our Energy Efficiency Test to work out your capacity to save. Find it at ",
+                    {
+                      text: "www.carbonfootprint.com/energy_efficiency_test.html",
+                      link: "http://www.carbonfootprint.com/energy_efficiency_test.html",
+                      color: "blue",
+                    },
+                  ],
                 },
                 {
                   text: "Be realistic - if your target is dependent on a massive capex that has yet to be signed or on a large cultural shift, you may want to be more conservative with your aims.",
@@ -753,38 +781,54 @@ function CbfPdf() {
           fontSize: 15,
         },
         {
+          margin: [30, 0, 0, 0],
           fontSize: 15,
           ul: [
-            `Explain why climate change matters to you (visit www.carbonfootprint.com/warning.html for more
-              information)
+            {
+              text: "Explain why climate change matters to you (visit www.carbonfootprint.com/warning.html for more information)",
+            },
+            {
+              margin: [0, 5, 0, 5],
+              text: "Be clear and accurate about what you've done",
+            },
+            {
+              text: ` Don't be tempted to exaggerate - this sector hates "green-wash" even if its unintentional`,
+            },
+            {
+              margin: [0, 5, 0, 5],
+
+              text: " Evidence - use pictures more than words. Certificates, images of offset projects you are supporting and graphs of your carbon performance, all of which we can supply, can helpcommunicate your point in a clearer and more enticing manner",
+            },
+            {
+              text: ` Tell a story - show where you have come from, the progress you have made and what your
+              commitment is for the future
               `,
-            `Be clear and accurate about what you've done
-          `,
-            ` Don't be tempted to exaggerate - this sector hates "green-wash" even if it's unintentional
-            `,
-            ` Evidence - use pictures more than words. Certificates, images of offset projects you are
-            supporting and graphs of your carbon performance, all of which we can supply, can help
-            communicate your point in a clearer and more enticing manner
-            `,
-            ` Tell a story - show where you have come from, the progress you have made and what your
-            commitment is for the future
-            `,
+            },
           ],
         },
         {
-          text: `When promoting internally, ensure to:
-        `,
+          margin: [0, 0, 0, 5],
+          text: [
+            "When promoting ",
+            {
+              text: "internally",
+              italics: true,
+            },
+            ", ensure to:",
+          ],
           fontSize: 15,
         },
+
         {
           fontSize: 15,
           ul: [
-            `Explain Climate Change & Why it matters (visit for more www.carbonfootprint,com/warning.html
-              for more information)
-              `,
-            ` Get people involved (Also see Reduce section)
-  
-          `,
+            {
+              text: "Explain Climate Change & Why it matters (visit for more www.carbonfootprint,com/warning.html for more information)",
+            },
+            {
+              margin: [0, 5, 0, 0],
+              text: " Get people involved (Also see Reduce section)",
+            },
           ],
         },
         footerCustomMargin6,
@@ -862,7 +906,7 @@ function CbfPdf() {
         },
         pieDescriptionText: {
           margin: [170, 0, 0, 40],
-          fontSize: 15,
+          fontSize: 16,
         },
         cbfListPage1: {
           fontSize: 16,
@@ -887,7 +931,8 @@ function CbfPdf() {
       window.open(pdfUrl, "_blank");
     });
   };
-  const chartData = {
+
+  const pieChartData = {
     labels: Object.keys(emissionParams)
       .filter((key) => emissionParams[key].hasOwnProperty("emissions"))
       .map((key) => emissionParams[key].title || key),
@@ -897,14 +942,14 @@ function CbfPdf() {
         data: Object.keys(emissionParams)
           .filter((key) => emissionParams[key].hasOwnProperty("emissions"))
           .map((key) => emissionParams[key].emissions),
-        backgroundColor: ["#f56942", "purple", "green", "yellow"],
+        backgroundColor: ["#f56942", "purple", "#ad5650", "yellow"],
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,
       },
     ],
   };
 
-  <ChartComponent data={chartData} />;
+  // <ChartComponent data={chartData} />;
 
   const barChartData = {
     labels: ["Your footprint", "Office based", "High energy organziation"],
@@ -916,7 +961,7 @@ function CbfPdf() {
           emissionParams.barChartData.highEnergyOrganizations || 20,
         ],
         backgroundColor: ["#48c268"],
-        borderColor: "rgba(75,192,192,1)",
+        borderColor: "green",
         borderWidth: 1,
       },
     ],
@@ -931,7 +976,7 @@ function CbfPdf() {
         Download PDF
       </button>
       {url && <div>{url}</div>}
-      <ChartComponent data={chartData} />
+      <PieChart data={pieChartData} />
       <BarChart data={barChartData} />
     </div>
   );

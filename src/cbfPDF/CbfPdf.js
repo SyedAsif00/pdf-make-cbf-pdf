@@ -1,6 +1,6 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   logoImage,
   measureImg,
@@ -37,6 +37,7 @@ function CbfPdf() {
       highEnergyOrganizations: 20,
     },
   };
+
   function generateEmissionDetails(emissionParams) {
     const dynamicData = [];
     let totalEmissions = 0;
@@ -658,7 +659,9 @@ function CbfPdf() {
               fontSize: 15,
 
               text: [
-                "You will probably be heavily reliant on the actions of your teams for reductions to be achieved. Awareness campaigns including the use of tools such as informative posters and 'Lunch and Learn' sessions can help motivate such behavioral changes. ",
+                {
+                  text: "You will probably be heavily reliant on the actions of your teams for reductions to be achieved. Awareness campaigns including the use of tools such as informative posters and 'Lunch and Learn' sessions can help motivate such behavioral changes. ",
+                },
                 {
                   text: "Contact us",
                   link: "mailto:your-email@example.com",
@@ -668,14 +671,11 @@ function CbfPdf() {
               ],
             },
             {
-              text: `Rather than relying on a volunteer committee and carbon champions, make your scheme more official by
-            giving specific team members ownership of the reductions and placing the targets in their KPIs.
-            `,
+              text: "Rather than relying on a volunteer committee and carbon champions, make your scheme more official by giving specific team members ownership of the reductions and placing the targets in their KPIs.",
               fontSize: 15,
             },
             {
-              text: `Celebrate successes with your staff when they occur and be clear on the difference and value this brings
-            to the business. (Also see Communicate section).`,
+              text: "Celebrate successes with your staff when they occur and be clear on the difference and value this brings to the business. (Also see Communicate section).",
               fontSize: 15,
             },
           ],
@@ -924,12 +924,12 @@ function CbfPdf() {
         },
       },
     };
-    const pdfGenerator = pdfMake.createPdf(docDefinition);
-    pdfGenerator.getBlob((blob) => {
-      const pdfUrl = URL.createObjectURL(blob);
-      setUrl(pdfUrl);
-      window.open(pdfUrl, "_blank");
-    });
+    const pdfGenerator = pdfMake.createPdf(docDefinition).download();
+    // pdfGenerator.getBlob((blob) => {
+    //   const pdfUrl = URL.createObjectURL(blob);
+    //   setUrl(pdfUrl);
+    //   window.open(pdfUrl, "_blank");
+    // });
   };
 
   const pieChartData = {
@@ -948,9 +948,6 @@ function CbfPdf() {
       },
     ],
   };
-
-  // <ChartComponent data={chartData} />;
-
   const barChartData = {
     labels: ["Your footprint", "Office based", "High energy organziation"],
     datasets: [
@@ -968,7 +965,7 @@ function CbfPdf() {
   };
 
   return (
-    <div className="App">
+    <div>
       <button
         style={{ padding: "10px 10px", cursor: "pointer" }}
         onClick={createPdf}

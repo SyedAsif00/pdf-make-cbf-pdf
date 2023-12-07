@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { Chart } from "chart.js/auto";
-import html2canvas from "html2canvas";
 
 const ChartComponent = ({ data }) => {
   const canvasRef = useRef(null);
@@ -36,13 +35,18 @@ const ChartComponent = ({ data }) => {
             },
             ticks: {
               font: {
-                size: 50,
+                size: 30,
               },
             },
           },
           y: {
             grid: {
-              offset: false,
+              offset: true,
+            },
+            ticks: {
+              font: {
+                size: 30,
+              },
             },
           },
         },
